@@ -878,7 +878,7 @@ hp=MHP();
 {const secs=Math.min((Date.now()-S.t)/1000,8*3600);if(secs>60){const g=Math.floor(secs*0.25*gpk()*0.5);S.gold+=g;$('msg').textContent='🧘 ระหว่างบำเพ็ญเพียร ได้ 🪙 '+fmt(g)}}
 spawn();
 let last=Date.now();
-function gameTick(){if(window._hold){last=Date.now();return}
+function gameTick(){if(window._hold||(S.botOff&&!D)){last=Date.now();return}
  const now=Date.now(),dt=Math.min(now-last,500);last=now;
  if(now<stopUntil){render();return}heroCd-=dt;monCd-=dt;for(let i=0;i<6;i++)if(skCds[i]>0)skCds[i]-=dt;skG-=dt;buTick(dt);if(mstun>0){mstun-=dt;if(monCd<350)monCd=350}
  if(D){D.t-=dt/1000;if(D.t<=0){dgEnd(false);return}}
@@ -5051,4 +5051,40 @@ svg .wbray{animation-name:wbRay2!important;animation-duration:1.1s}
  setInterval(tick,700);
  const _g=gApply;gApply=function(){_g.apply(this,arguments);tick()};
 })();
+
+/* ================= ปุ่มเริ่ม/หยุดบอท ================= */
+(function(){
+document.head.insertAdjacentHTML('beforeend',`<style>
+#botb{position:absolute;left:8px;bottom:70px;z-index:8;display:flex;align-items:center;gap:5px;padding:6px 11px 6px 7px;border-radius:20px;border:2px solid #7dff9a;background:linear-gradient(#1f5a2a,#0c2a12);color:#eaffea;font:inherit;font-size:12.5px;font-weight:900;box-shadow:0 0 10px #3aff6a77,0 3px 6px #000a;text-shadow:0 1px 2px #000}
+#botb i{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;background:#3aff6a;color:#0c2a12}
+#botb.off{border-color:#ff7a7a;background:linear-gradient(#5a1a1a,#2a0808);color:#ffeaea;box-shadow:0 0 10px #ff3a3a77,0 3px 6px #000a}
+#botb.off i{background:#ff4a4a;color:#2a0808}
+#botb:active{transform:scale(.94)}
+#botov{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:7;padding:6px 16px;border-radius:12px;background:#000a;border:2px solid #ff7a7a;color:#ffd0d0;font-weight:900;font-size:15px;pointer-events:none;text-shadow:0 1px 2px #000}
+</style>`);
+const A=$('arena'),b=document.createElement('button');b.id='botb';A.appendChild(b);
+const ov=document.createElement('div');ov.id='botov';ov.textContent='⏸ หยุดโจมตีอัตโนมัติ';A.appendChild(ov);
+function ui(){const off=!!S.botOff;b.className=off?'off':'';const h=off?'<i>⚔️</i><span>โจมตีอัตโนมัติ<small>ปิดอยู่</small></span>':'<i>⚔️</i><span>โจมตีอัตโนมัติ<small>กำลังทำงาน</small></span>';if(b._h!==h){b._h=h;b.innerHTML=h}ov.style.display=off&&!D?'':'none'}
+b.onclick=e=>{e.stopPropagation();S.botOff=!S.botOff;sfx('equip');banner(S.botOff?'⏸ ปิดโจมตีอัตโนมัติ':'⚔️ เปิดโจมตีอัตโนมัติ');ui()};
+ui();setInterval(ui,800);
+try{gApply()}catch(e){}
+})();
+
+document.head.insertAdjacentHTML('beforeend',`<style>
+#botb{position:absolute;padding:4px 14px 4px 4px!important;gap:7px!important;border-radius:26px!important;border:2px solid #ffd23f!important;background:linear-gradient(135deg,#7a1a08,#c8401a 45%,#ff9a1a)!important;box-shadow:0 0 14px #ff8a1aaa,inset 0 2px 0 #ffffff55,0 4px 8px #000a!important;overflow:hidden;animation:botG 1.8s ease-in-out infinite}
+@keyframes botG{50%{box-shadow:0 0 22px #ffd23f,inset 0 2px 0 #ffffff55,0 4px 8px #000a}}
+#botb::after{content:"";position:absolute;top:0;bottom:0;width:30px;left:-40px;background:linear-gradient(90deg,transparent,#fff8,transparent);transform:skewX(-20deg);animation:botS 2.4s ease-in-out infinite}
+@keyframes botS{to{left:130%}}
+#botb i{width:32px!important;height:32px!important;font-size:17px!important;background:radial-gradient(circle at 40% 35%,#fff6c0,#ffb02e 60%,#8a3a04)!important;border:2px solid #fff3b0;box-shadow:0 0 8px #ffd23f;animation:botR 3s linear infinite}
+@keyframes botR{to{transform:rotate(360deg)}}
+#botb span{display:flex;flex-direction:column;line-height:1.1;font-size:13.5px;font-weight:900;color:#fff;text-shadow:0 1px 2px #5a1200,0 0 6px #ff6a1a;text-align:left}
+#botb small{font-size:10px;color:#fff3b0;font-weight:800}
+#botb.off{border-color:#9aa4b0!important;background:linear-gradient(135deg,#2a2a34,#4a4a58)!important;box-shadow:0 3px 6px #000a!important;animation:none}
+#botb.off::after{display:none}
+#botb.off i{background:radial-gradient(circle,#c8c8d0,#5a5a68)!important;border-color:#c8c8d0;box-shadow:none;animation:none;filter:grayscale(1)}
+#botb.off span{text-shadow:0 1px 2px #000}#botb.off small{color:#ff8a8a}
+.g-lowanim #botb,.g-lowanim #botb i,.g-lowanim #botb::after{animation:none!important}
+</style>`);
+
+document.head.insertAdjacentHTML('beforeend','<style>#botb{padding:2px 9px 2px 2px!important;gap:4px!important}#botb i{width:22px!important;height:22px!important;font-size:12px!important}#botb span{font-size:11px!important}#botb small{font-size:8.5px!important}</style>');
 </script></body></html>
