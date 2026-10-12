@@ -3860,6 +3860,7 @@ const _gs=gSvg;gSvg=function(){_gs.apply(this,arguments);go()};
 const _rw=renderWg;renderWg=function(){const r=_rw.apply(this,arguments);go();return r};
 setInterval(()=>{if(!$('wgw').hidden)go()},600);go();})();
 
+window.POSE={fa:-15,f2:-105,bu:10};
 /* ================= ระดับการขยับแยกตามระบบ (ตัวละคร/สัตว์/ออร่า/มอน/ไอเทม/สกิล) ================= */
 (function(){
 ['mh','mp','ma','mm','mi','mk'].forEach(k=>{if(G[k]==null)G[k]=2});
@@ -3868,7 +3869,7 @@ animClock=function(now){requestAnimationFrame(animClock);if(now-_acL<([0,100,50,
  const T=(now-_acT0)/1000,C=acCache(),st=(el,v)=>{if(el&&el._tv!==v){el._tv=v;el.style.transform=v}},F=x=>x.toFixed(2);
  const kh=AM[G.mh],th=T*SP[G.mh],a=aosc(th,1.6)*kh,b2=aosc(th,1.6,-.075)*kh;
  st(C.ub,`translateY(${F(1.2*a)}px) scale(${F(1+.02*a)},${F(1-.025*a)})`);st(C.hd,`rotate(${F(-2*b2)}deg) translateY(${F(1.4*b2)}px)`);
- st(C.fa,`rotate(${F(-30+6*a)}deg)`);st(C.f2,`rotate(${F(-60-6*a)}deg)`);st(C.wg,`rotate(${F(5*a)}deg)`);st(C.bu,`rotate(${F(25+7*a)}deg)`);st(C.hr,`rotate(${F(5*a)}deg)`);
+ const PZ=window.POSE;st(C.fa,`rotate(${F(PZ.fa+6*a)}deg)`);st(C.f2,`rotate(${F(PZ.f2-6*a)}deg)`);st(C.wg,`rotate(${F(5*a)}deg)`);st(C.bu,`rotate(${F(PZ.bu+7*a)}deg)`);st(C.hr,`rotate(${F(5*a)}deg)`);
  C.rib.forEach((r,i)=>st(r,`rotate(${F(-8*Math.min(1,kh)+22*kh*aosc(th,2,i*.13))}deg)`));const bl=G.mh&&(T%4.5)>4.38;C.eye.forEach(e=>st(e,bl?'scaleY(.1)':'none'));
  C.fl.forEach((e,i)=>st(e,`scaleY(${F(.85+.27*aosc(th,.7,i*.21))})`));
  const ka=AM[G.ma],ta=T*SP[G.ma];
@@ -5100,4 +5101,42 @@ let was=false;setInterval(()=>{const idle=!!S.botOff&&!D&&!window._hold;if(idle=
 })();
 
 document.head.insertAdjacentHTML('beforeend','<style>#botov{display:none!important}</style>');
+
+/* แฟชั่น: ย้ายแขนเสื้อ/เกราะไหล่ให้ติดไปกับแขนที่ขยับ */
+(function(){const NS='http://www.w3.org/2000/svg';
+const BK=['M47 63Q37 78'];
+const _fa=fsApply;fsApply=function(sv,o,fem){_fa.apply(this,arguments);if(!sv||!o)return;
+ const ba=sv.querySelector('.barm2u'),fa=sv.querySelector('.farm');if(!ba||!fa)return;
+ const gB=document.createElementNS(NS,'g');gB.setAttribute('class','fsx');const gF=document.createElementNS(NS,'g');gF.setAttribute('class','fsx');
+ sv.querySelectorAll('.fsx').forEach(g=>{if(g.closest('.barm2u,.farm'))return;[...g.children].forEach(e=>{
+  const d=e.getAttribute&&e.getAttribute('d')||'';
+  if(e.tagName==='path'&&BK.some(b=>d.startsWith(b)))gB.appendChild(e);
+  else if(e.tagName==='circle'&&e.getAttribute('cx')==='48.5'&&e.getAttribute('cy')==='60')gB.appendChild(e);
+  else if(e.tagName==='g'&&(e.getAttribute('transform')||'').startsWith('translate(121 0)')){const f=e.firstElementChild,fd=f&&f.getAttribute('d')||'';if(BK.some(b=>fd.startsWith(b)))gF.appendChild(e)}})});
+ // แขนเสื้อหลังให้พอดีแขน: ย่อให้แนบแขน
+ gB.innerHTML='';const P=fsParts(o,fem);if(o.t>=2){const tr=FTH[o.h].c[2],U=sv.dataset.fsu;
+  gB.innerHTML=`<path d="M45.8 61Q51 56.5 56.6 61L57.6 77.5Q51.2 80.5 44.6 77.5Z" fill="url(#fsg${U})" stroke="#1a0a0a" stroke-width="1.2"/><path d="M44.8 76.5Q51.2 79.6 57.4 76.5" stroke="${tr}" stroke-width="1.6" fill="none"/>`;
+  gF.innerHTML=`<path d="M63.8 61Q69 56.5 74.6 61L75.6 77.5Q69.2 80.5 62.6 77.5Z" fill="url(#fsg${U})" stroke="#1a0a0a" stroke-width="1.2"/><path d="M62.8 76.5Q69.2 79.6 75.4 76.5" stroke="${tr}" stroke-width="1.6" fill="none"/>`}
+ const sl=ba.querySelector('.slv');ba.insertBefore(gB,sl?sl.nextSibling:ba.firstChild);const sf=fa.querySelector('.slv');fa.insertBefore(gF,sf?sf.nextSibling:fa.firstChild)};
+})();
+
+/* ท่ายืนแบบคนจริง: ก้าวขาหน้า-หลัง แขนผ่อนถือดาบชี้ไปข้างหน้า */
+document.head.insertAdjacentHTML('beforeend','<style>#hs .leg.l,#csH .leg.l,#wst .leg.l{transform:rotate(10deg)}#hs .leg.r,#csH .leg.r,#wst .leg.r{transform:rotate(-14deg)}#csH .farm,#wst .farm{transform:rotate(5deg)}#csH .farm2,#wst .farm2{transform:rotate(-75deg)}#csH .barm2u,#wst .barm2u{transform:rotate(8deg)}</style>');
+
+/* ท่าตั้งการ์ด: ย่อเข่า ยกดาบเฉียงขึ้น */
+document.head.insertAdjacentHTML('beforeend','<style>#hs .leg.l,#csH .leg.l,#wst .leg.l{transform:rotate(14deg)}#hs .leg.r,#csH .leg.r,#wst .leg.r{transform:rotate(-18deg)}#hs .leg.l .shin,#csH .leg.l .shin,#wst .leg.l .shin{transform:rotate(-8deg)}#hs .leg.r .shin,#csH .leg.r .shin,#wst .leg.r .shin{transform:rotate(14deg)}#csH .farm,#wst .farm{transform:rotate(-15deg)}#csH .farm2,#wst .farm2{transform:rotate(-105deg)}#csH .barm2u,#wst .barm2u{transform:rotate(10deg)}</style>');
+
+/* ท่ายืน: กางขา ชูดาบตั้ง */
+document.head.insertAdjacentHTML('beforeend','<style>#hs .leg.l,#csH .leg.l,#wst .leg.l{transform:rotate(18deg)}#hs .leg.r,#csH .leg.r,#wst .leg.r{transform:rotate(-18deg)}#hs .leg.l .shin,#csH .leg.l .shin,#wst .leg.l .shin,#hs .leg.r .shin,#csH .leg.r .shin,#wst .leg.r .shin{transform:rotate(0deg)}#csH .farm,#wst .farm{transform:rotate(-95deg)}#csH .farm2,#wst .farm2{transform:rotate(-60deg)}#csH .barm2u,#wst .barm2u{transform:rotate(25deg)}</style>');
+
+/* ================= ลำตัวสัดส่วนใหม่ (ท่า 5) ================= */
+document.head.insertAdjacentHTML('beforeend','<style>#hs .leg.l,#csH .leg.l,#wst .leg.l{transform:rotate(14deg)}#hs .leg.r,#csH .leg.r,#wst .leg.r{transform:rotate(-18deg)}#hs .leg.l .shin,#csH .leg.l .shin,#wst .leg.l .shin{transform:rotate(-8deg)}#hs .leg.r .shin,#csH .leg.r .shin,#wst .leg.r .shin{transform:rotate(14deg)}#csH .farm,#wst .farm{transform:rotate(-15deg)}#csH .farm2,#wst .farm2{transform:rotate(-105deg)}#csH .barm2u,#wst .barm2u{transform:rotate(10deg)}</style>');
+window.bodyFix=function(sv){if(!sv||sv.dataset.bf)return;const NS='http://www.w3.org/2000/svg',q=s=>sv.querySelector(s);const ub=q('.ubody'),hg=q('.headg');if(!ub||!hg)return;sv.dataset.bf=1;
+ const wrap=(el,tr)=>{const g=document.createElementNS(NS,'g');g.setAttribute('transform',tr);g.setAttribute('class','bfw');el.parentNode.insertBefore(g,el);g.appendChild(el)};
+ wrap(hg,'translate(60 56) scale(.86) translate(-60 -56)');
+ wrap(ub,'translate(0 -4.4) rotate(3 60 94)');
+ sv.querySelectorAll('.leg').forEach(l=>wrap(l,'translate(0 123) scale(1 1.12) translate(0 -123)'));
+ const rb=q('#rb');if(rb)rb.setAttribute('d','M45.5 60.5Q60 54 75.5 60.5L71.5 83Q72.5 92 69.5 94H51.5Q48.5 92 49.5 83Z')};
+setInterval(()=>{const sv=document.querySelector('#hs svg');if(sv&&!sv.dataset.bf){bodyFix(sv);try{_acC=null}catch(e){}}},400);
+bodyFix(document.querySelector('#hs svg'));
 </script></body></html>
